@@ -20,7 +20,7 @@ public class App {
         webAppContext.setResourceBase("src/main/webapp");
 
         FileInputStream serviceAccount = new FileInputStream(FirebaseConfig.getServiceAccountKeyPath());
-        FirebaseOptions options = new FirebaseOptions.Builder()
+        FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                 .setDatabaseUrl(FirebaseConfig.getDatabaseUrl())
                 .build();
@@ -32,7 +32,6 @@ public class App {
 
         ServletHolder servletHolder2 = new ServletHolder(Movies.class);
         webAppContext.addServlet(servletHolder2, "/movies");
-
 
         server.setHandler(webAppContext);
         server.start();

@@ -64,7 +64,7 @@ public class Authentication extends HttpServlet {
       res.message = "User created";
       response.setContentType("application/json");
       response.setStatus(HttpServletResponse.SC_OK);
-      response.getWriter().println(new Gson().toJson(res));
+      response.getWriter().println(new Gson().toJson(res.message));
     }
   }
 
