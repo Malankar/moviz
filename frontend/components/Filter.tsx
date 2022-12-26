@@ -52,7 +52,7 @@ function Accordian() {
           </Disclosure>
         </div>
         <div className="bg-white shadow-md rounded-lg mb-5">
-          <Disclosure defaultOpen>
+          <Disclosure>
             {({ open }) => (
               <>
                 <Disclosure.Button className="flex w-full items-center justify-between rounded-lg bg-white px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-gray-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
@@ -122,7 +122,6 @@ function Accordian() {
             )}
           </Disclosure>
         </div>
-        
       </div>
     </div>
   );
