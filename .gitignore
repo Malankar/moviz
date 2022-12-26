@@ -10,3 +10,4 @@ backend/.vscode
 
 backend/secretkey
 
+backend/app/src/main/java/com/anywhere/firebase/FirebaseConfig.java
