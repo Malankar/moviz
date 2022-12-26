@@ -1,2 +1,0 @@
-com/anywhere/AppTest.java
- com.anywhere.AppTest
