@@ -4,8 +4,6 @@
 # Ignore Gradle build output directory
 app/build
 
-app/src/main/java/com/anywhere/firebase/FirebaseConfig.java
-
 app/bin
 
 .idea
