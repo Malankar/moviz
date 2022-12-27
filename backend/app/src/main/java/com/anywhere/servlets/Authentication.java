@@ -30,6 +30,7 @@ public class Authentication extends HttpServlet {
     // Get the email and password from the request
     String email = body.get("email").getAsString();
     String password = body.get("password").getAsString();
+    String username = body.get("username").getAsString();
 
     // Validate the email and password
     if (email == null || password == null || email.isEmpty() || password.isEmpty()) {
@@ -53,7 +54,8 @@ public class Authentication extends HttpServlet {
         user = FirebaseAuth.getInstance().createUser(
             new UserRecord.CreateRequest()
                 .setEmail(email)
-                .setPassword(password));
+                .setPassword(password)
+                .setDisplayName(username));
         String verificationLink = FirebaseAuth.getInstance().generateEmailVerificationLink(email);
         System.out.println(verificationLink);
       } catch (FirebaseAuthException ex) {
