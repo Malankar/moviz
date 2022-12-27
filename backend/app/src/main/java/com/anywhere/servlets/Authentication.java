@@ -18,14 +18,14 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-@WebServlet(name = "AuthenticateServlet", urlPatterns = {"/authenticate"})
+@WebServlet(name = "AuthenticateServlet", urlPatterns = { "/authenticate" })
 public class Authentication extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-    //Read the request body as a JSON object
+    // Read the request body as a JSON object
     BufferedReader reader = new BufferedReader(new InputStreamReader(request.getInputStream()));
-    JsonObject body = new Gson().fromJson(reader,JsonObject.class);
+    JsonObject body = new Gson().fromJson(reader, JsonObject.class);
 
     // Get the email and password from the request
     String email = body.get("email").getAsString();
@@ -41,7 +41,7 @@ public class Authentication extends HttpServlet {
     UserRecord user;
     try {
       // Check if the user with the given email already exists
-      user=FirebaseAuth.getInstance().getUserByEmail(email);
+      user = FirebaseAuth.getInstance().getUserByEmail(email);
       // User already exists
       response.setContentType("application/json");
       response.setStatus(HttpServletResponse.SC_CONFLICT);
@@ -51,10 +51,10 @@ public class Authentication extends HttpServlet {
       // Create the user
       try {
         user = FirebaseAuth.getInstance().createUser(
-                new UserRecord.CreateRequest()
-                        .setEmail(email)
-                        .setPassword(password));
-        String verificationLink=FirebaseAuth.getInstance().generateEmailVerificationLink(email);
+            new UserRecord.CreateRequest()
+                .setEmail(email)
+                .setPassword(password));
+        String verificationLink = FirebaseAuth.getInstance().generateEmailVerificationLink(email);
         System.out.println(verificationLink);
       } catch (FirebaseAuthException ex) {
         throw new RuntimeException(ex);
@@ -71,7 +71,7 @@ public class Authentication extends HttpServlet {
 
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    //Read the request body as a JSON object
+    // Read the request body as a JSON object
     BufferedReader reader = new BufferedReader(new InputStreamReader(request.getInputStream()));
     JsonObject body = new Gson().fromJson(reader, JsonObject.class);
 
@@ -79,10 +79,10 @@ public class Authentication extends HttpServlet {
     String email = body.get("email").getAsString();
     String password = body.get("password").getAsString();
 
-// Validate the email and password
+    // Validate the email and password
     if (email == null || password == null || email.isEmpty() || password.isEmpty()) {
       response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-      response.getWriter().println("Email and password are required.");
+      response.getWriter().println("{\"message\": \"Email and password are required.\"}");
       return;
     }
 
@@ -98,9 +98,9 @@ public class Authentication extends HttpServlet {
     // Send the POST request to the Firebase Auth REST API
     HttpClient client = HttpClient.newHttpClient();
     HttpRequest apiRequest = HttpRequest.newBuilder()
-            .uri(URI.create(url))
-            .POST(HttpRequest.BodyPublishers.ofString(payload.toString()))
-            .build();
+        .uri(URI.create(url))
+        .POST(HttpRequest.BodyPublishers.ofString(payload.toString()))
+        .build();
     HttpResponse<String> apiResponse = null;
     try {
       apiResponse = client.send(apiRequest, HttpResponse.BodyHandlers.ofString());
@@ -108,12 +108,13 @@ public class Authentication extends HttpServlet {
       throw new RuntimeException(e);
     }
 
-// Handle the response from the Firebase Auth REST API
+    // Handle the response from the Firebase Auth REST API
     if (apiResponse.statusCode() == 200) {
       // Authentication was successful, send a response back to the client
       try {
-        UserRecord user=FirebaseAuth.getInstance().getUserByEmail(email);
+        UserRecord user = FirebaseAuth.getInstance().getUserByEmail(email);
         response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("json");
         response.getWriter().println(new Gson().toJson(user));
       } catch (FirebaseAuthException e) {
         throw new RuntimeException(e);
@@ -121,9 +122,9 @@ public class Authentication extends HttpServlet {
     } else {
       // Authentication failed, send a response back to the client
       response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-      response.getWriter().println("Invalid email or password.");
+      response.setContentType("json");
+      response.getWriter().println("{\"message\": \"Invalid email or password.\"}");
     }
-
 
   }
 
