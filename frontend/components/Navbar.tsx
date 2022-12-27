@@ -1,5 +1,6 @@
 import { BiSearchAlt } from "react-icons/bi";
 // import { MdLogout } from "react-icons/md";
+import Auth from "./Auth"
 function Navbar() {
   return (
     <div className="flex justify-center items-center p-5 max-w-7xl m-auto space-x-4">
@@ -27,7 +28,9 @@ function Navbar() {
         </div>
       </div>
       {/* right side - refresh to sync database icon + grid to list icon + change theme icon + user icon */}
-      <div className="relative">
+      <Auth/>
+      
+      {/* <div className="relative">
         <div className="flex-none">
           <div className="cursor-pointer flex items-center justify-around py-1.5 px-1 shadow-md rounded-lg">
             <div className="rounded-full bg-black text-white px-3 py-1.5 font-bold">A</div>
@@ -36,7 +39,7 @@ function Navbar() {
             </p>
           </div>
         </div>
-        {/* <div
+        <div
           id="dropdown"
           className="absolute cursor-pointer z-10 w-32 right-4/4 mt-2 rounded-lg shadow bg-gray-800"
         >
@@ -49,8 +52,8 @@ function Navbar() {
               <span className="block py-2 px-4 ">Sign Out</span>
             </li>
           </ul>
-        </div> */}
-      </div>
+        </div>
+      </div> */}
     </div>
   );
 }

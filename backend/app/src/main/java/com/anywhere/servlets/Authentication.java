@@ -6,7 +6,6 @@ import com.google.firebase.auth.UserRecord;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,11 +17,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-@WebServlet(name = "AuthenticateServlet", urlPatterns = { "/authenticate" })
 public class Authentication extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
+    response.setHeader("Access-Control-Allow-Origin", "*");
     // Read the request body as a JSON object
     BufferedReader reader = new BufferedReader(new InputStreamReader(request.getInputStream()));
     JsonObject body = new Gson().fromJson(reader, JsonObject.class);
@@ -31,7 +29,7 @@ public class Authentication extends HttpServlet {
     String email = body.get("email").getAsString();
     String password = body.get("password").getAsString();
     String username = body.get("username").getAsString();
-
+    System.out.println("" + email + password + username);
     // Validate the email and password
     if (email == null || password == null || email.isEmpty() || password.isEmpty()) {
       response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -42,11 +40,10 @@ public class Authentication extends HttpServlet {
     UserRecord user;
     try {
       // Check if the user with the given email already exists
-      user = FirebaseAuth.getInstance().getUserByEmail(email);
+      FirebaseAuth.getInstance().getUserByEmail(email);
       // User already exists
       response.setContentType("application/json");
       response.setStatus(HttpServletResponse.SC_CONFLICT);
-      System.out.println(new Gson().toJson(user));
       response.getWriter().println("{\"message\": \"User already exists\"}");
     } catch (FirebaseAuthException e) {
       // Create the user
@@ -73,13 +70,10 @@ public class Authentication extends HttpServlet {
 
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    // Read the request body as a JSON object
-    BufferedReader reader = new BufferedReader(new InputStreamReader(request.getInputStream()));
-    JsonObject body = new Gson().fromJson(reader, JsonObject.class);
+    response.setHeader("Access-Control-Allow-Origin", "*");
 
-    // Get the email and password from the request
-    String email = body.get("email").getAsString();
-    String password = body.get("password").getAsString();
+    String email = request.getParameter("email");
+    String password = request.getParameter("password");
 
     // Validate the email and password
     if (email == null || password == null || email.isEmpty() || password.isEmpty()) {
