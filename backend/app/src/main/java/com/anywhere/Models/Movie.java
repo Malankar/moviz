@@ -1,27 +1,29 @@
 package com.anywhere.Models;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Movie {
     private String title;
     private String description;
     private String releaseDate;
-    private String genre;
-    private float rating;
+    private List<String> genre;
+    private double rating;
     private String director;
     private String cast;
+
+    List<String> languages;
 
     public Movie(){
 
     }
-    public Movie(String title, String description, String releaseDate, String genre, float rating, String director, String cast) {
+    public Movie(String title, String description, String releaseDate, Double rating, String director,String[] lang, String[] genre, String cast) {
         this.title = title;
         this.description = description;
         this.releaseDate = releaseDate;
-        this.genre = genre;
         this.rating = Math.round(rating * 10) / 10.0f;
         this.director = director;
+        this.languages= Arrays.asList(lang);
+        this.genre = Arrays.asList(genre);
         this.cast = cast;
     }
     public Map<String, Object> toMap() {
@@ -32,6 +34,7 @@ public class Movie {
         map.put("genre", genre);
         map.put("rating", rating);
         map.put("director", director);
+        map.put("languages",languages);
         map.put("cast", cast);
         return map;
     }
@@ -60,21 +63,18 @@ public class Movie {
         this.releaseDate = releaseDate;
     }
 
-    public String getGenre() {
+    public List<String> getGenre() {
         return genre;
     }
 
-    public void setGenre(String genre) {
+    public void setGenre(List<String> genre) {
         this.genre = genre;
     }
 
-    public float getRating() {
+    public double getRating() {
         return rating;
     }
 
-    public void setRating(float rating) {
-        this.rating = rating;
-    }
 
     public String getDirector() {
         return director;
@@ -84,11 +84,37 @@ public class Movie {
         this.director = director;
     }
 
+    public void setRating(double rating) {
+        this.rating = rating;
+    }
+
+    public List<String> getLanguages() {
+        return languages;
+    }
+
+    public void setLanguages(List<String> languages) {
+        this.languages = languages;
+    }
+
     public String getCast() {
         return cast;
     }
 
     public void setCast(String cast) {
         this.cast = cast;
+    }
+
+    @Override
+    public String toString() {
+        return "Movie{" +
+                "title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", releaseDate='" + releaseDate + '\'' +
+                ", genre='" + genre + '\'' +
+                ", rating=" + rating +
+                ", director='" + director + '\'' +
+                ", cast='" + cast + '\'' +
+                ", languages=" + languages +
+                '}';
     }
 }

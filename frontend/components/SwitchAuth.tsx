@@ -4,7 +4,10 @@ import axios from "axios";
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
-function SwitchAuth() {
+type Props = {
+  handleClick: () => void;
+};
+const SwitchAuth: React.FC<Props> = ({ handleClick }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
@@ -13,26 +16,41 @@ function SwitchAuth() {
     e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
   ) {
     e.preventDefault();
-    const res = await axios.get(
-      `http://localhost:8080/auth?email=${email}&password=${password}`
-    );
-    if (res.status == 200) {
-      localStorage.setItem("user", JSON.stringify(res.data));
+    try {
+      if (password !== confirmPass) {
+        console.log("Check Your Confirm Password");
+      } else {
+        const res = await axios.get(
+          `http://localhost:8080/auth?email=${email}&password=${password}`
+        );
+        localStorage.setItem("user", JSON.stringify(res.data));
+        handleClick();
+      }
+    } catch (e) {
+      if (email == "" || password == "") {
+        console.log("Please Enter Email and Password");
+      }
+      console.log("Email or Password is Wrong");
     }
   }
   async function Signup(
     e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
   ) {
     e.preventDefault();
-    const res = await axios.post("http://localhost:8080/auth", {
-      email,
-      password,
-      username,
-    });
-    if (res.status == 200) {
-      console.log(res);
-    } else {
-      console.log("user already exists");
+    try {
+      const res = await axios.post("http://localhost:8080/auth", {
+        email,
+        password,
+        username,
+      });
+      localStorage.setItem("user", JSON.stringify(res.data));
+      handleClick();
+    } catch (e) {
+      if (email == "" || password == "" || username == "") {
+        console.log("Please Enter Username, Email and Password");
+      } else {
+        console.log("User already exists");
+      }
     }
   }
 
@@ -206,6 +224,6 @@ function SwitchAuth() {
       </Tab.Group>
     </div>
   );
-}
+};
 
 export default SwitchAuth;

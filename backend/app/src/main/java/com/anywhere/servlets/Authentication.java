@@ -6,6 +6,7 @@ import com.google.firebase.auth.UserRecord;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,8 +20,24 @@ import java.net.http.HttpResponse;
 
 public class Authentication extends HttpServlet {
   @Override
-  protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  protected void doOptions(HttpServletRequest request, HttpServletResponse response) {
     response.setHeader("Access-Control-Allow-Origin", "*");
+    response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    response.setHeader("Access-Control-Max-Age", "3600");
+    response.setHeader("Access-Control-Allow-Headers", "x-requested-with, Content-Type");
+    response.setStatus(HttpServletResponse.SC_OK);
+  }
+
+  @Override
+  protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    response.setHeader("Access-Control-Allow-Origin", "*");
+    response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    response.setHeader("Access-Control-Max-Age", "3600");
+    response.setHeader("Access-Control-Allow-Headers", "x-requested-with, Content-Type");
+    super.service(request, response);
+  }
+  @Override
+  protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     // Read the request body as a JSON object
     BufferedReader reader = new BufferedReader(new InputStreamReader(request.getInputStream()));
     JsonObject body = new Gson().fromJson(reader, JsonObject.class);
@@ -53,8 +70,6 @@ public class Authentication extends HttpServlet {
                 .setEmail(email)
                 .setPassword(password)
                 .setDisplayName(username));
-        String verificationLink = FirebaseAuth.getInstance().generateEmailVerificationLink(email);
-        System.out.println(verificationLink);
       } catch (FirebaseAuthException ex) {
         throw new RuntimeException(ex);
       }
@@ -63,14 +78,12 @@ public class Authentication extends HttpServlet {
       // Return a success message
       response.setContentType("application/json");
       response.setStatus(HttpServletResponse.SC_OK);
-      response.getWriter().println("{\"message\": \"User created successfully\"}");
       response.getWriter().println(new Gson().toJson(user));
     }
   }
 
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    response.setHeader("Access-Control-Allow-Origin", "*");
 
     String email = request.getParameter("email");
     String password = request.getParameter("password");
@@ -97,7 +110,7 @@ public class Authentication extends HttpServlet {
         .uri(URI.create(url))
         .POST(HttpRequest.BodyPublishers.ofString(payload.toString()))
         .build();
-    HttpResponse<String> apiResponse = null;
+    HttpResponse<String> apiResponse;
     try {
       apiResponse = client.send(apiRequest, HttpResponse.BodyHandlers.ofString());
     } catch (InterruptedException e) {

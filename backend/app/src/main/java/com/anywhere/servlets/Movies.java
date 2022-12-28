@@ -16,7 +16,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -41,9 +43,8 @@ public class Movies extends HttpServlet {
                 .collect(Collectors.joining("\n"));
         Gson gson = new Gson();
         Movie movie = gson.fromJson(requestBody, Movie.class);
-
         // Check if the movie already exists
-        ApiFuture<DocumentSnapshot> future = firestore.collection("movies").document(movie.getTitle()).get();
+        ApiFuture<DocumentSnapshot> future = firestore.collection("movies").document(movie.getTitle().trim()).get();
         try {
             DocumentSnapshot snapshot = future.get();
             if (snapshot.exists()) {
@@ -53,7 +54,6 @@ public class Movies extends HttpServlet {
 
                 PrintWriter writer = response.getWriter();
                 writer.println("{\"message\": \"Movie already exists\"}");
-                return;
             }
             else{
                 // Movie does not exist, add it to the database
@@ -79,38 +79,54 @@ public class Movies extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         FirebaseApp app = FirebaseApp.getInstance();
-        Firestore firestore = FirestoreClient.getFirestore(app);
+        Firestore db = FirestoreClient.getFirestore(app);
 
-        String movieTitle = request.getParameter("title");
-        if (movieTitle == null) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
+        String requestType = request.getParameter("type");
+        if(requestType==null){
+            // Initialize the Firebase Admin SDK and create a Firestore client
+
+            ApiFuture<QuerySnapshot> future = db.collection("movies").get();
+            List<QueryDocumentSnapshot> documents;
+            List<String> moviesList = new ArrayList<>();
+            try {
+                documents = future.get().getDocuments();
+                for (QueryDocumentSnapshot document : documents) {
+                    moviesList.add(new Gson().toJson(document.toObject(Movie.class)));
+                }
+                response.setContentType("json");
+                response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                response.getWriter().println(moviesList);
+            } catch (InterruptedException | ExecutionException e) {
+                System.out.println("error"+e);
+            }
+        }
+        else if (requestType.equals("search")) {
+            String movie = request.getParameter("movie");
+            DocumentReference docRef = db.collection("movies").document(movie.trim());
+            ApiFuture<DocumentSnapshot> future = docRef.get();
+            DocumentSnapshot document;
+            try {
+                document = future.get();
+                if(document.getData() != null){
+                    response.setContentType("json");
+                    response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                    response.getWriter().println(new Gson().toJson(document.getData()));
+                }else{
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.getWriter().println("No such Movie exists in our Database :(");
+                }
+
+            } catch (InterruptedException | ExecutionException e) {
+                System.out.println("Something went wrong");
+            }
+        } else if(requestType.equals("filter")){
+            System.out.println("type is filter");
+        } else{
+          response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+          response.getWriter().println("Invalid request");
         }
 
-        ApiFuture<DocumentSnapshot> future = firestore.collection("movies").document(movieTitle).get();
-        DocumentSnapshot document;
-        try {
-            document = future.get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
 
-        if (document.exists()) {
-            Movie movie = document.toObject(Movie.class);
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.setContentType("application/json");
-
-            PrintWriter writer = response.getWriter();
-            Gson gson = new Gson();
-            String movieJson = gson.toJson(movie);
-            writer.println(movieJson);
-        } else {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            response.setContentType("application/json");
-
-            PrintWriter writer = response.getWriter();
-            writer.println("{\"message\": \"Movie not found\"}");
-        }
     }
 
     protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -123,9 +139,9 @@ public class Movies extends HttpServlet {
         }
 
         // Check if the document exists
-        DocumentReference docRef = firestore.collection("movies").document(movieTitle);
+        DocumentReference docRef = firestore.collection("movies").document(movieTitle.trim());
         ApiFuture<DocumentSnapshot> future = docRef.get();
-        DocumentSnapshot document = null;
+        DocumentSnapshot document;
         try {
             document = future.get();
         } catch (InterruptedException | ExecutionException e) {
@@ -183,9 +199,9 @@ public class Movies extends HttpServlet {
         }
 
         // Check if the document exists
-        DocumentReference docRef = firestore.collection("movies").document(movieTitle);
+        DocumentReference docRef = firestore.collection("movies").document(movieTitle.trim());
         ApiFuture<DocumentSnapshot> future = docRef.get();
-        DocumentSnapshot document = null;
+        DocumentSnapshot document;
         try {
             document = future.get();
         } catch (InterruptedException | ExecutionException e) {
