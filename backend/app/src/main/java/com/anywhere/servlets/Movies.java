@@ -6,6 +6,7 @@ import com.google.cloud.firestore.*;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -15,23 +16,35 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 public class Movies extends HttpServlet {
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-        String method = req.getMethod();
+    protected void doOptions(HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        response.setHeader("Access-Control-Max-Age", "3600");
+        response.setHeader("Access-Control-Allow-Headers", "x-requested-with, Content-Type");
+        response.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        response.setHeader("Access-Control-Max-Age", "3600");
+        response.setHeader("Access-Control-Allow-Headers", "x-requested-with, Content-Type");
+        super.service(request, response);
+        String method = request.getMethod();
         if (!method.equals("PATCH")) {
-            super.service(req, resp);
+            super.service(request, response);
         }
         else{
-            this.doPatch(req, resp);
+            this.doPatch(request, response);
         }
     }
     @Override
@@ -93,7 +106,7 @@ public class Movies extends HttpServlet {
                 for (QueryDocumentSnapshot document : documents) {
                     moviesList.add(new Gson().toJson(document.toObject(Movie.class)));
                 }
-                response.setContentType("json");
+                response.setContentType("application/json");
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
                 response.getWriter().println(moviesList);
             } catch (InterruptedException | ExecutionException e) {
@@ -108,9 +121,10 @@ public class Movies extends HttpServlet {
             try {
                 document = future.get();
                 if(document.getData() != null){
-                    response.setContentType("json");
+                    Movie movieData=document.toObject(Movie.class);
+                    response.setContentType("application/json");
                     response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                    response.getWriter().println(new Gson().toJson(document.getData()));
+                    response.getWriter().println(new Gson().toJson(movieData));
                 }else{
                     response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                     response.getWriter().println("No such Movie exists in our Database :(");
@@ -120,7 +134,32 @@ public class Movies extends HttpServlet {
                 System.out.println("Something went wrong");
             }
         } else if(requestType.equals("filter")){
-            System.out.println("type is filter");
+            String genre=request.getParameter("genre");
+            Type listType = new TypeToken<ArrayList<String>>(){}.getType();
+            Gson gson = new Gson();
+            List<String> genreArray = gson.fromJson(genre, listType);
+            ApiFuture<QuerySnapshot> future = db.collection("movies")
+                    .whereArrayContainsAny("genre", genreArray)
+                    .get();
+            try {
+                List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+                if(documents.size()>0){
+                    List<Movie> listOfMovies = new ArrayList<>();
+                    for (DocumentSnapshot document : documents) {
+                        listOfMovies.add(document.toObject(Movie.class));
+                    }
+                    response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                    response.setContentType("application/json");
+                    response.getWriter().println(new Gson().toJson(listOfMovies));
+                } else{
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.setContentType("application/json");
+                    response.getWriter().println("{\"message\": \"No such documents found\"}");
+                }
+
+            } catch (InterruptedException | ExecutionException e) {
+                System.out.println("Something went wrong"+e);
+            }
         } else{
           response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
           response.getWriter().println("Invalid request");

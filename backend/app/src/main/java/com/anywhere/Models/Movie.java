@@ -11,18 +11,21 @@ public class Movie {
     private String director;
     private String cast;
 
-    List<String> languages;
+    private String imageUrl;
+
+//    List<String> languages;
 
     public Movie(){
 
     }
-    public Movie(String title, String description, String releaseDate, Double rating, String director,String[] lang, String[] genre, String cast) {
+    public Movie(String title, String description,String imageUrl, String releaseDate, Double rating, String director, String[] genre, String cast) {
         this.title = title;
         this.description = description;
+        this.imageUrl =imageUrl;
         this.releaseDate = releaseDate;
         this.rating = Math.round(rating * 10) / 10.0f;
         this.director = director;
-        this.languages= Arrays.asList(lang);
+//        this.languages= Arrays.asList(lang);
         this.genre = Arrays.asList(genre);
         this.cast = cast;
     }
@@ -30,11 +33,12 @@ public class Movie {
         Map<String, Object> map = new HashMap<>();
         map.put("title", title);
         map.put("description", description);
+        map.put("imageUrl",imageUrl);
         map.put("releaseDate", releaseDate);
         map.put("genre", genre);
         map.put("rating", rating);
         map.put("director", director);
-        map.put("languages",languages);
+//        map.put("languages",languages);
         map.put("cast", cast);
         return map;
     }
@@ -57,6 +61,14 @@ public class Movie {
 
     public String getReleaseDate() {
         return releaseDate;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public void setReleaseDate(String releaseDate) {
@@ -88,13 +100,13 @@ public class Movie {
         this.rating = rating;
     }
 
-    public List<String> getLanguages() {
-        return languages;
-    }
-
-    public void setLanguages(List<String> languages) {
-        this.languages = languages;
-    }
+//    public List<String> getLanguages() {
+//        return languages;
+//    }
+//
+//    public void setLanguages(List<String> languages) {
+//        this.languages = languages;
+//    }
 
     public String getCast() {
         return cast;
@@ -109,12 +121,13 @@ public class Movie {
         return "Movie{" +
                 "title='" + title + '\'' +
                 ", description='" + description + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
                 ", releaseDate='" + releaseDate + '\'' +
                 ", genre='" + genre + '\'' +
                 ", rating=" + rating +
                 ", director='" + director + '\'' +
                 ", cast='" + cast + '\'' +
-                ", languages=" + languages +
+//                ", languages=" + languages +
                 '}';
     }
 }

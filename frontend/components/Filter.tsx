@@ -4,34 +4,34 @@ import { BsChevronDown } from "react-icons/bs";
 function Accordian() {
   const [languages, setLanguages] = useState<{ [key: string]: boolean }>({});
   const [genres, setGenres] = useState<{ [key: string]: boolean }>({});
-  const handleClick = (language: string) => {
-    if (languages[language]) {
-      // Language is already in the list, remove it
-      const newLanguages = { ...languages };
-      delete newLanguages[language];
-      setLanguages(newLanguages);
-    } else {
-      // Language is not in the list, add it
-      setLanguages({ ...languages, [language]: true });
-    }
-  };
-  const clearLanguages = (
-    e: React.MouseEvent<HTMLParagraphElement, MouseEvent>
-  ) => {
-    e.stopPropagation();
-    setLanguages({});
-  };
-  const languageList = [
-    "English",
-    "Telugu",
-    "Gujrati",
-    "Hindi",
-    "Tamil",
-    "Haryanavi",
-    "Marathi",
-    "Malayalam",
-    "Kannada",
-  ];
+  // const handleClick = (language: string) => {
+  //   if (languages[language]) {
+  //     // Language is already in the list, remove it
+  //     const newLanguages = { ...languages };
+  //     delete newLanguages[language];
+  //     setLanguages(newLanguages);
+  //   } else {
+  //     // Language is not in the list, add it
+  //     setLanguages({ ...languages, [language]: true });
+  //   }
+  // };
+  // const clearLanguages = (
+  //   e: React.MouseEvent<HTMLParagraphElement, MouseEvent>
+  // ) => {
+  //   e.stopPropagation();
+  //   setLanguages({});
+  // };
+  // const languageList = [
+  //   "English",
+  //   "Telugu",
+  //   "Gujrati",
+  //   "Hindi",
+  //   "Tamil",
+  //   "Haryanavi",
+  //   "Marathi",
+  //   "Malayalam",
+  //   "Kannada",
+  // ];
 
   const handleClickGenre = (genre: string) => {
     if (genres[genre]) {
@@ -78,7 +78,7 @@ function Accordian() {
     <>
       <div className="w-full mt-5">
         <div className="mx-auto w-full max-w-md rounded-2xl bg-white p-2">
-          <div className="bg-white shadow-md rounded-lg mb-5">
+          {/* <div className="bg-white shadow-md rounded-lg mb-5">
             <Disclosure defaultOpen>
               {({ open }) => (
                 <>
@@ -118,9 +118,9 @@ function Accordian() {
                 </>
               )}
             </Disclosure>
-          </div>
+          </div> */}
           <div className="bg-white shadow-md rounded-lg mb-5">
-            <Disclosure>
+            <Disclosure defaultOpen>
               {({ open }) => (
                 <>
                   <Disclosure.Button className="flex w-full items-center justify-between rounded-lg bg-white px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-gray-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
