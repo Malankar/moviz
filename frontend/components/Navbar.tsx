@@ -43,7 +43,7 @@ function Navbar() {
     window.location.reload();
   }
   return (
-    <div className="flex justify-center items-center p-5 max-w-7xl m-auto space-x-4">
+    <div className="flex justify-center items-center p-5 max-w-7xl m-auto space-x-4 bg-white rounded-lg">
       {/* left side - site logo  */}
       <div className="flex items-center">
         <img

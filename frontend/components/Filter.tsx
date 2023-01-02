@@ -1,8 +1,13 @@
 import { Disclosure } from "@headlessui/react";
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import { BsChevronDown } from "react-icons/bs";
-function Accordian() {
-  const [languages, setLanguages] = useState<{ [key: string]: boolean }>({});
+import Movie from "../types/Movie";
+interface FilterProps {
+  setMoviesData: React.Dispatch<React.SetStateAction<Movie | null>>;
+}
+const Filter: React.FC<FilterProps> = ({ setMoviesData }) => {
+  // const [languages, setLanguages] = useState<{ [key: string]: boolean }>({});
   const [genres, setGenres] = useState<{ [key: string]: boolean }>({});
   // const handleClick = (language: string) => {
   //   if (languages[language]) {
@@ -74,6 +79,29 @@ function Accordian() {
     "Western",
   ];
 
+  async function handleFilters() {
+    const filter = Object.keys(genres);
+    if (filter.length == 0) {
+      fetchData();
+    } else {
+      try {
+        const res = await axios.get(
+          "http://localhost:8080/movies?type=filter&genre=" +
+            JSON.stringify(filter)
+        );
+        setMoviesData(res.data);
+      } catch (error) {
+        setMoviesData(null);
+      }
+    }
+  }
+  async function fetchData() {
+    const res = await axios.get("http://localhost:8080/movies");
+    setMoviesData(res.data);
+  }
+  useEffect(() => {
+    fetchData();
+  }, []);
   return (
     <>
       <div className="w-full mt-5">
@@ -163,12 +191,15 @@ function Accordian() {
         </div>
       </div>
       <div className="px-3">
-        <button className="bg-blue-500 px-6 py-2 text-white font-bold rounded-lg">
+        <button
+          className="bg-blue-500 px-6 py-2 text-white font-bold rounded-lg"
+          onClick={handleFilters}
+        >
           Submit
         </button>
       </div>
     </>
   );
-}
+};
 
-export default Accordian;
+export default Filter;

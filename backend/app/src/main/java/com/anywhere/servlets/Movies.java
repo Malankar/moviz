@@ -26,7 +26,7 @@ public class Movies extends HttpServlet {
     @Override
     protected void doOptions(HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
         response.setHeader("Access-Control-Max-Age", "3600");
         response.setHeader("Access-Control-Allow-Headers", "x-requested-with, Content-Type");
         response.setStatus(HttpServletResponse.SC_OK);
@@ -35,10 +35,9 @@ public class Movies extends HttpServlet {
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
         response.setHeader("Access-Control-Max-Age", "3600");
         response.setHeader("Access-Control-Allow-Headers", "x-requested-with, Content-Type");
-        super.service(request, response);
         String method = request.getMethod();
         if (!method.equals("PATCH")) {
             super.service(request, response);
@@ -107,7 +106,7 @@ public class Movies extends HttpServlet {
                     moviesList.add(new Gson().toJson(document.toObject(Movie.class)));
                 }
                 response.setContentType("application/json");
-                response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                response.setStatus(HttpServletResponse.SC_OK);
                 response.getWriter().println(moviesList);
             } catch (InterruptedException | ExecutionException e) {
                 System.out.println("error"+e);
@@ -123,7 +122,7 @@ public class Movies extends HttpServlet {
                 if(document.getData() != null){
                     Movie movieData=document.toObject(Movie.class);
                     response.setContentType("application/json");
-                    response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                    response.setStatus(HttpServletResponse.SC_OK);
                     response.getWriter().println(new Gson().toJson(movieData));
                 }else{
                     response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -138,28 +137,35 @@ public class Movies extends HttpServlet {
             Type listType = new TypeToken<ArrayList<String>>(){}.getType();
             Gson gson = new Gson();
             List<String> genreArray = gson.fromJson(genre, listType);
-            ApiFuture<QuerySnapshot> future = db.collection("movies")
-                    .whereArrayContainsAny("genre", genreArray)
-                    .get();
-            try {
-                List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-                if(documents.size()>0){
-                    List<Movie> listOfMovies = new ArrayList<>();
-                    for (DocumentSnapshot document : documents) {
-                        listOfMovies.add(document.toObject(Movie.class));
+            if(genreArray.size()!=0){
+                ApiFuture<QuerySnapshot> future = db.collection("movies")
+                        .whereArrayContainsAny("genre", genreArray)
+                        .get();
+                try {
+                    List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+                    if(documents.size()>0){
+                        List<Movie> listOfMovies = new ArrayList<>();
+                        for (DocumentSnapshot document : documents) {
+                            listOfMovies.add(document.toObject(Movie.class));
+                        }
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        response.setContentType("application/json");
+                        response.getWriter().println(new Gson().toJson(listOfMovies));
+                    } else{
+                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                        response.setContentType("application/json");
+                        response.getWriter().println("{\"message\": \"No such documents found\"}");
                     }
-                    response.setStatus(HttpServletResponse.SC_ACCEPTED);
-                    response.setContentType("application/json");
-                    response.getWriter().println(new Gson().toJson(listOfMovies));
-                } else{
-                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    response.setContentType("application/json");
-                    response.getWriter().println("{\"message\": \"No such documents found\"}");
-                }
 
-            } catch (InterruptedException | ExecutionException e) {
-                System.out.println("Something went wrong"+e);
+                } catch (InterruptedException | ExecutionException e) {
+                    System.out.println("Something went wrong  "+e);
+                }
+            }else{
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.setContentType("application/json");
+                response.getWriter().println("{\"message\": \"Enter Filters\"}");
             }
+
         } else{
           response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
           response.getWriter().println("Invalid request");

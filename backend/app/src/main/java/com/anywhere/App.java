@@ -31,6 +31,7 @@ public class App {
         webAppContext.addServlet(servletHolder, "/auth");
 
         ServletHolder servletHolder2 = new ServletHolder(Movies.class);
+        servletHolder2.setInitParameter("urlPattern", "/auth");
         webAppContext.addServlet(servletHolder2, "/movies");
 
         server.setHandler(webAppContext);
