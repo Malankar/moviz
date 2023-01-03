@@ -2,10 +2,12 @@ import Movie from "../types/Movie";
 import { AiFillStar } from "react-icons/ai";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
+import { useNavigate } from "react-router-dom";
 interface MovieDetail {
   movie: Movie | null;
 }
 const MovieDetail: React.FC<MovieDetail> = ({ movie }) => {
+  const navigate = useNavigate();
   let [isOpen, setIsOpen] = useState(false);
   const [selectedSeat, setSelectedSeat] = useState(1);
   function closeModal() {
@@ -15,16 +17,18 @@ const MovieDetail: React.FC<MovieDetail> = ({ movie }) => {
   function openModal() {
     setIsOpen(true);
   }
-
+  function handleBooking() {
+    navigate(`/${movie?.title}/book/${selectedSeat}`);
+    closeModal();
+  }
   const seats = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   const handleSeatSelection = (seat: number) => {
     setSelectedSeat(seat);
   };
-  console.log(selectedSeat);
 
   return (
     <>
-      <div className="bg-black text-white">
+      <div>
         <div className="w-full md:max-w-7xl m-auto lg:flex block">
           <div className="flex justify-center lg:w-1/4">
             <img src={movie?.imageUrl} className="p-10" alt="" />
@@ -40,7 +44,7 @@ const MovieDetail: React.FC<MovieDetail> = ({ movie }) => {
               {movie?.genre.join(", ")} • {movie?.releaseDate}
             </p>
             <button
-              className="bg-[#F84464] px-8 py-3 text-md font-semibold rounded-lg font-sans"
+              className="bg-[#F84464] px-8 py-3 text-md font-semibold rounded-lg font-sans text-white"
               onClick={openModal}
             >
               Book tickets
@@ -90,6 +94,7 @@ const MovieDetail: React.FC<MovieDetail> = ({ movie }) => {
                           seat === selectedSeat ? "bg-[#F84464] text-white" : ""
                         }`}
                         onClick={() => handleSeatSelection(seat)}
+                        key={seat}
                       >
                         {seat}
                       </div>
@@ -115,11 +120,7 @@ const MovieDetail: React.FC<MovieDetail> = ({ movie }) => {
                   <button
                     className="w-full bg-[#F84464] text-white py-2 rounded-lg mt-5"
                     onClick={() => {
-                      if (selectedSeat !== 0) {
-                        closeModal();
-                      } else {
-                        return;
-                      }
+                      handleBooking();
                     }}
                   >
                     Select Seats

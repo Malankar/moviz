@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { BiSearchAlt } from "react-icons/bi";
 import { MdLogout } from "react-icons/md";
-import { Router } from "react-router-dom";
+import { Router, useNavigate } from "react-router-dom";
 import Auth from "./Auth";
 type User = {
   uid: string;
@@ -27,6 +27,7 @@ type AltUser = {
   displayName: string;
 };
 function Navbar() {
+  const navigate = useNavigate();
   const [user, setUser] = useState<User | AltUser>({ displayName: "null" });
   const [visible, setVisible] = useState(false);
   let userData: string | null;
@@ -52,6 +53,7 @@ function Navbar() {
           className="shadow-lg rounded-full"
           width={50}
           height={50}
+          onClick={() => navigate(`/`)}
         />
       </div>
       {/* middle search bar */}

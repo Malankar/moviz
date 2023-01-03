@@ -35,7 +35,7 @@ const Movie = () => {
           <div>
             <Navbar />
             <MovieDetail movie={movie} />
-            <div className="bg-black text-white">
+            <div>
               <div className="md:max-w-6xl m-auto">
                 <h1 className="text-3xl font-semibold p-10 lg:p-0">Director</h1>
                 <div className="flex p-10">
