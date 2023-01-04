@@ -103,17 +103,17 @@ const MovieDetail: React.FC<MovieDetail> = ({ movie }) => {
                   <div className="flex space-x-10 justify-center text-xs mt-5">
                     <div className="text-center">
                       <h1>NORMAL</h1>{" "}
-                      <h1 className="font-semibold">Rs. 450.00</h1>{" "}
+                      <h1 className="font-semibold">Rs. 300.00</h1>{" "}
                       <h1 className="text-green-500">Available</h1>
                     </div>
                     <div className="text-center">
                       <h1>EXECUTIVE</h1>{" "}
-                      <h1 className="font-semibold">Rs. 500.00</h1>{" "}
+                      <h1 className="font-semibold">Rs. 300.00</h1>{" "}
                       <h1 className="text-green-500">Available</h1>
                     </div>
                     <div className="text-center">
                       <h1>PREMIUM</h1>{" "}
-                      <h1 className="font-semibold">Rs. 550.00</h1>{" "}
+                      <h1 className="font-semibold">Rs. 350.00</h1>{" "}
                       <h1 className="text-green-500">Available</h1>
                     </div>
                   </div>

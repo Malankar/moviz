@@ -1,13 +1,18 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
-
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+interface Seats {
+  movie: string;
+  seats: string[];
+}
 const Seats = () => {
   const params = useParams();
-
+  const navigate = useNavigate();
   const number = Array.from({ length: 28 }, (_, index) => index + 1);
   const letters = Array.from({ length: 15 }, (_, index) =>
     String.fromCharCode(index + 65)
   );
+  const [dbSeats, setDbSeats] = useState<Seats | null>(null);
   const spaces = [
     "B1",
     "C1",
@@ -85,7 +90,6 @@ const Seats = () => {
     "O28",
   ];
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
-  const [spaceToWalk, setSpaceToWalk] = useState<string[]>(spaces);
   const handleSeatClick = (letter: string, number: number) => {
     const element = letter + number;
     if (params.seats != undefined) {
@@ -102,10 +106,31 @@ const Seats = () => {
     }
   };
 
+  const handleConfirmSeats = async () => {
+    await axios.patch("http://localhost:8080/seats", {
+      seats: selectedSeats,
+      movie: params.name,
+    });
+    navigate(`/${params.name}`);
+  };
+  async function getSeats() {
+    try {
+      const res = await axios.get(
+        `http://localhost:8080/seats?movie=${params.name}`
+      );
+      setDbSeats(res.data);
+    } catch (error) {
+      setDbSeats(null);
+    }
+  }
+  useEffect(() => {
+    getSeats();
+  }, []);
+
   return (
     <div className="scale-75 flex justify-center">
       <div>
-        <p className="text-lg">Royal-Rs. 320.00</p>
+        <p className="text-lg">Royal-Rs. 350.00</p>
         <div className="flex items-start mt-2">
           <div>
             {letters
@@ -120,13 +145,18 @@ const Seats = () => {
                           selectedSeats.includes(letter + number) &&
                           `bg-emerald-400 text-white border-none `
                         } ${
-                          spaceToWalk.includes(letter + number) &&
+                          spaces.includes(letter + number) &&
                           `bg-white text-white border-none pointer-events-none shadow-none`
-                        }`}
+                        }
+                        ${
+                          dbSeats?.seats.includes(letter + number) &&
+                          `bg-gray-300 text-white border-none pointer-events-none shadow-none`
+                        }
+                        `}
                         onClick={() => handleSeatClick(letter, number)}
                         key={`${letter}${number}`}
                       >
-                        {!spaceToWalk.includes(letter + number) && number}
+                        {!spaces.includes(letter + number) && number}
                       </div>
                     ))}
                   </div>
@@ -149,13 +179,18 @@ const Seats = () => {
                           selectedSeats.includes(letter + number) &&
                           `bg-emerald-400 text-white border-none `
                         } ${
-                          spaceToWalk.includes(letter + number) &&
+                          spaces.includes(letter + number) &&
                           `bg-white text-white border-none pointer-events-none shadow-none`
-                        }`}
+                        }
+                        ${
+                          dbSeats?.seats.includes(letter + number) &&
+                          `bg-gray-300 text-white border-none pointer-events-none shadow-none`
+                        }
+                        `}
                         onClick={() => handleSeatClick(letter, number)}
                         key={`${letter}${number}`}
                       >
-                        {!spaceToWalk.includes(letter + number) && number}
+                        {!spaces.includes(letter + number) && number}
                       </div>
                     ))}
                   </div>
@@ -178,13 +213,18 @@ const Seats = () => {
                           selectedSeats.includes(letter + number) &&
                           `bg-emerald-400 text-white border-none `
                         } ${
-                          spaceToWalk.includes(letter + number) &&
+                          spaces.includes(letter + number) &&
                           `bg-white text-white border-none pointer-events-none shadow-none`
-                        }`}
+                        }
+                        ${
+                          dbSeats?.seats.includes(letter + number) &&
+                          `bg-gray-300 text-white border-none pointer-events-none shadow-none`
+                        }
+                        `}
                         onClick={() => handleSeatClick(letter, number)}
                         key={`${letter}${number}`}
                       >
-                        {!spaceToWalk.includes(letter + number) && number}
+                        {!spaces.includes(letter + number) && number}
                       </div>
                     ))}
                   </div>
@@ -193,7 +233,10 @@ const Seats = () => {
           </div>
         </div>
         <div className="flex justify-center mt-5">
-          <button className="px-20 text-2xl py-5 bg-red-500 text-white rounded-lg">
+          <button
+            className="px-20 text-2xl py-5 bg-red-500 text-white rounded-lg"
+            onClick={handleConfirmSeats}
+          >
             Confirm Seats
           </button>
         </div>
