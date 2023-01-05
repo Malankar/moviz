@@ -1,11 +1,8 @@
 package com.anywhere.servlets;
 
-import com.anywhere.Models.SeatsModel;
+import com.anywhere.Models.SeatsModel2;
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.WriteResult;
+import com.google.cloud.firestore.*;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.gson.Gson;
@@ -18,12 +15,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-public class Seats extends HttpServlet {
+public class Seats2 extends HttpServlet {
     @Override
     protected void doOptions(HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "*");
@@ -55,34 +51,51 @@ public class Seats extends HttpServlet {
                 .lines()
                 .collect(Collectors.joining("\n"));
         Gson gson = new Gson();
-        SeatsModel seats = gson.fromJson(requestBody, SeatsModel.class);
-        ApiFuture<DocumentSnapshot> future = db.collection("seats").document(seats.getMovie().trim()).get();
+        SeatsModel2 seats = gson.fromJson(requestBody, SeatsModel2.class);
+        var email= seats.getUsers().keySet().stream().findFirst().orElse(null);
+        DocumentReference docRef = db.collection("seats2").document(seats.getMovie().trim());
         try {
-            DocumentSnapshot snapshot = future.get();
+            DocumentSnapshot snapshot =docRef.get().get();
             if (snapshot.exists()) {
-                List<String> seatsArray= Objects.requireNonNull(snapshot.toObject(SeatsModel.class)).getSeats();
+                var dbData=Objects.requireNonNull(snapshot.toObject(SeatsModel2.class));
                 boolean booked=false;
-                for (String seat : seats.getSeats()) {
+                List<String> seatsArray=dbData.getSeats();
+                for (String seat:seats.getSeats()) {
                     if (!seatsArray.contains(seat)) {
                         seatsArray.add(seat);
                     }else{
                         booked=true;
                     }
                 }
-                if(booked){
+                if(!booked){
+                    var users= dbData.getUsers();
+                    //when you want to change seats for user who already booked movie
+                    if(users.containsKey(email)){
+                        var user = users.get(email);
+                        user.addAll(seats.getSeats());
+                        users.put(email,user);
+                        docRef.update("seats",seatsArray);
+                        docRef.update("users",users);
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        response.setContentType("application/json");
+                        response.getWriter().write(gson.toJson(seats));
+                    }
+                    //when you want to add new users seats
+                    else{
+                        users.put(email,seats.getSeats());
+                        docRef.update("seats",seatsArray);
+                        docRef.update("users",users);
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        response.setContentType("application/json");
+                        response.getWriter().println("{\"message\": \"Added seats according to user\"}");
+                    }
+                }else{
                     response.setStatus(HttpServletResponse.SC_CONFLICT);
                     response.setContentType("application/json");
-                    response.getWriter().println("{\"message\": \"Seats already booked\"}");
-                }else {
-                    DocumentReference docRef = db.collection("seats").document(seats.getMovie());
-                    ApiFuture<WriteResult> updateSeats = docRef.update("seats", seatsArray);
-                    updateSeats.get();
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    response.setContentType("application/json");
-                    response.getWriter().println("{\"message\": \"Seats added to respective movie\"}");
+                    response.getWriter().println("{\"message\": \"Already Booked\"}");
                 }
             }else{
-                ApiFuture<WriteResult> writeFuture = db.collection("seats").document(seats.getMovie()).set(seats);
+                ApiFuture<WriteResult> writeFuture = db.collection("seats2").document(seats.getMovie()).set(seats);
                 try {
                     writeFuture.get();
                 } catch (InterruptedException | ExecutionException e) {
@@ -100,25 +113,25 @@ public class Seats extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response){
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         FirebaseApp app = FirebaseApp.getInstance();
         Firestore db = FirestoreClient.getFirestore(app);
-        String movieName = request.getParameter("movie");
-        ApiFuture<DocumentSnapshot> future = db.collection("seats").document(movieName.trim()).get();
+        String movie = request.getParameter("movie");
+        var docRef = db.collection("seats2").document(movie).get();
         try {
-            DocumentSnapshot snapshot = future.get();
+            var snapshot =docRef.get();
             if (snapshot.exists()) {
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.setContentType("application/json");
                 response.getWriter().println(new Gson().toJson(snapshot.getData()));
-            } else {
+            }else{
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 response.setContentType("application/json");
-                response.getWriter().println("{\"message\": \"No such Movie exists in our DB!\"}");
+                response.getWriter().println("{\"message\": \"Movie not found\"}");
             }
-        } catch (InterruptedException | ExecutionException | IOException e) {
+        } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
-
     }
+
 }

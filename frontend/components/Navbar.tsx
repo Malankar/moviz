@@ -3,26 +3,7 @@ import { BiSearchAlt } from "react-icons/bi";
 import { MdLogout } from "react-icons/md";
 import { Router, useNavigate } from "react-router-dom";
 import Auth from "./Auth";
-type User = {
-  uid: string;
-  email: string;
-  emailVerified: boolean;
-  displayName: string;
-  disabled: boolean;
-  providers: {
-    uid: string;
-    displayName: string;
-    email: string;
-    providerId: string;
-  }[];
-  tokensValidAfterTimestamp: number;
-  userMetadata: {
-    creationTimestamp: number;
-    lastSignInTimestamp: number;
-    lastRefreshTimestamp: number;
-  };
-  customClaims: {};
-};
+import User from "../types/User"
 type AltUser = {
   displayName: string;
 };

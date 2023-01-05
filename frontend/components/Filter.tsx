@@ -77,7 +77,7 @@ const Filter: React.FC<FilterProps> = ({ setMoviesData }) => {
     "Sport",
     "War",
     "Western",
-  ];
+  ].sort();
 
   async function handleFilters() {
     const filter = Object.keys(genres);

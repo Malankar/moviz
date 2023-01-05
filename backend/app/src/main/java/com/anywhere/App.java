@@ -4,6 +4,7 @@ import com.anywhere.firebase.FirebaseConfig;
 import com.anywhere.servlets.Movies;
 import com.anywhere.servlets.Authentication;
 import com.anywhere.servlets.Seats;
+import com.anywhere.servlets.Seats2;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -38,6 +39,10 @@ public class App {
         ServletHolder servletHolder3 = new ServletHolder(Seats.class);
         servletHolder3.setInitParameter("urlPattern", "/seats");
         webAppContext.addServlet(servletHolder3, "/seats");
+
+        ServletHolder servletHolder4 = new ServletHolder(Seats2.class);
+        servletHolder4.setInitParameter("urlPattern", "/seats/2");
+        webAppContext.addServlet(servletHolder4, "/seats/2");
 
         server.setHandler(webAppContext);
         server.start();

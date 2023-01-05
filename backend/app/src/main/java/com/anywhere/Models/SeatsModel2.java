@@ -1,20 +1,19 @@
 package com.anywhere.Models;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class SeatsModel {
+public class SeatsModel2 {
     List<String> seats;
     String movie;
 
     Map<String,List<String>> users;
 
-    public SeatsModel(){
+    public SeatsModel2(){
 
     }
 
-    public SeatsModel(List<String> seats, String movie, Map<String, List<String>> users) {
+    public SeatsModel2(List<String> seats, String movie, Map<String, List<String>> users) {
         this.seats = seats;
         this.movie = movie;
         this.users = users;

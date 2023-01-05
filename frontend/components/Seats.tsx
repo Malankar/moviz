@@ -1,12 +1,14 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import User from "../types/User";
 interface Seats {
   movie: string;
   seats: string[];
 }
 const Seats = () => {
   const params = useParams();
+  const location=useLocation();
   const navigate = useNavigate();
   const number = Array.from({ length: 28 }, (_, index) => index + 1);
   const letters = Array.from({ length: 15 }, (_, index) =>
@@ -106,17 +108,34 @@ const Seats = () => {
     }
   };
 
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    setUser(JSON.parse(JSON.stringify(localStorage.getItem("user"))));
+  }, []);
+
   const handleConfirmSeats = async () => {
-    await axios.patch("http://localhost:8080/seats", {
-      seats: selectedSeats,
-      movie: params.name,
-    });
-    navigate(`/${params.name}`);
+    if (user !== null) {
+      const email = JSON.parse(user).email;
+      try {
+        const res = await axios.patch("http://localhost:8080/seats/2", {
+          seats: selectedSeats,
+          movie: params.name,
+          users: {
+            [email]: selectedSeats,
+          },
+        });
+        console.log(res);
+        navigate(location.pathname, { replace: true });
+      } catch (error) {
+        console.log(error);
+      }
+    }
   };
   async function getSeats() {
     try {
       const res = await axios.get(
-        `http://localhost:8080/seats?movie=${params.name}`
+        `http://localhost:8080/seats/2?movie=${params.name}`
       );
       setDbSeats(res.data);
     } catch (error) {
