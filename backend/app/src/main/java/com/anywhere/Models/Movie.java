@@ -29,20 +29,6 @@ public class Movie {
         this.genre = Arrays.asList(genre);
         this.cast = cast;
     }
-    public Map<String, Object> toMap() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("title", title);
-        map.put("description", description);
-        map.put("imageUrl",imageUrl);
-        map.put("releaseDate", releaseDate);
-        map.put("genre", genre);
-        map.put("rating", rating);
-        map.put("director", director);
-//        map.put("languages",languages);
-        map.put("cast", cast);
-        return map;
-    }
-
     public String getTitle() {
         return title;
     }

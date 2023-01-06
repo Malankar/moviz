@@ -1,10 +1,7 @@
 package com.anywhere;
 
 import com.anywhere.firebase.FirebaseConfig;
-import com.anywhere.servlets.Movies;
-import com.anywhere.servlets.Authentication;
-import com.anywhere.servlets.Seats;
-import com.anywhere.servlets.Seats2;
+import com.anywhere.servlets.*;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -36,13 +33,17 @@ public class App {
         servletHolder2.setInitParameter("urlPattern", "/movies");
         webAppContext.addServlet(servletHolder2, "/movies");
 
-        ServletHolder servletHolder3 = new ServletHolder(Seats.class);
-        servletHolder3.setInitParameter("urlPattern", "/seats");
-        webAppContext.addServlet(servletHolder3, "/seats");
+        ServletHolder servletHolder4 = new ServletHolder(Seats.class);
+        servletHolder4.setInitParameter("urlPattern", "/seats");
+        webAppContext.addServlet(servletHolder4, "/seats");
 
-        ServletHolder servletHolder4 = new ServletHolder(Seats2.class);
-        servletHolder4.setInitParameter("urlPattern", "/seats/2");
-        webAppContext.addServlet(servletHolder4, "/seats/2");
+        ServletHolder servletHolder5 = new ServletHolder(Search.class);
+        servletHolder5.setInitParameter("urlPattern", "/movies/search");
+        webAppContext.addServlet(servletHolder5, "/movies/search");
+
+        ServletHolder servletHolder6 = new ServletHolder(Filter.class);
+        servletHolder6.setInitParameter("urlPattern", "/movies/filter");
+        webAppContext.addServlet(servletHolder6, "/movies/filter");
 
         server.setHandler(webAppContext);
         server.start();

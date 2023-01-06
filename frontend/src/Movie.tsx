@@ -13,7 +13,7 @@ const Movie = () => {
   useEffect(() => {
     async function getMovie() {
       const res = await axios.get(
-        `http://localhost:8080/movies?type=search&movie=${params.name}`
+        `http://localhost:8080/movies?type=search&movieName=${params.name}`
       );
       if (res.status == 200) {
         setLoading("success");

@@ -118,15 +118,14 @@ const Seats = () => {
     if (user !== null) {
       const email = JSON.parse(user).email;
       try {
-        const res = await axios.patch("http://localhost:8080/seats/2", {
+        const res = await axios.patch("http://localhost:8080/seats", {
           seats: selectedSeats,
           movie: params.name,
           users: {
             [email]: selectedSeats,
           },
         });
-        console.log(res);
-        navigate(location.pathname, { replace: true });
+        navigate(`/${params.name}`, { replace: true });
       } catch (error) {
         console.log(error);
       }
@@ -135,7 +134,7 @@ const Seats = () => {
   async function getSeats() {
     try {
       const res = await axios.get(
-        `http://localhost:8080/seats/2?movie=${params.name}`
+        `http://localhost:8080/seats?movie=${params.name}`
       );
       setDbSeats(res.data);
     } catch (error) {
