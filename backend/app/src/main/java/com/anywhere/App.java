@@ -45,6 +45,10 @@ public class App {
         servletHolder6.setInitParameter("urlPattern", "/movies/filter");
         webAppContext.addServlet(servletHolder6, "/movies/filter");
 
+        ServletHolder servletHolder7 = new ServletHolder(SearchTitles.class);
+        servletHolder7.setInitParameter("urlPattern", "/movies/title");
+        webAppContext.addServlet(servletHolder7, "/movies/title");
+
         server.setHandler(webAppContext);
         server.start();
         server.join();

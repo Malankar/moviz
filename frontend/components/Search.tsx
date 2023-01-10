@@ -40,7 +40,7 @@ const Search: React.FC<SearchProps> =({closeModal,isOpen})=>{
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="w-full h-full max-w-lg transform rounded-2xl text-left shadow-xl transition-all">
-                  <SearchMovie />
+                  <SearchMovie closeModal={closeModal}/>
                 </Dialog.Panel>
               </Transition.Child>
             </div>

@@ -1,12 +1,40 @@
 import { Fragment, useEffect, useState } from "react";
 import { Combobox, Transition } from "@headlessui/react";
 import { BiSearchAlt } from "react-icons/bi";
-import { BsArrowReturnLeft, BsArrowReturnRight } from "react-icons/bs";
-
-const SearchAll = () => {
-  const [groups, setGroups] = useState([]);
-  const [selected, setSelected] = useState(groups[0]);
+import axios from "axios";
+import Movie from "../types/Movie";
+import { useNavigate } from "react-router-dom";
+interface SearchAllProps {
+  closeModal: () => void;
+}
+const SearchAll: React.FC<SearchAllProps> = ({ closeModal }) => {
+  const navigate = useNavigate();
+  const [groups, setGroups] = useState<Movie[] | []>([]);
+  const [selected, setSelected] = useState(null);
   const [query, setQuery] = useState("");
+
+  async function getTitle() {
+    try {
+      const res = await axios.get(
+        `http://localhost:8080/movies/title?title=${query}`
+      );
+      setGroups(res.data);
+    } catch (e) {
+      setGroups([]);
+    }
+  }
+  useEffect(() => {
+    if (selected != null) {
+      closeModal();
+      navigate(`/${selected}`);
+      window.location.reload();
+    }
+    if (query == "") {
+      setGroups([]);
+    } else {
+      getTitle();
+    }
+  }, [query]);
 
   return (
     <>
@@ -29,8 +57,36 @@ const SearchAll = () => {
             leaveTo="opacity-0"
             afterLeave={() => setQuery("")}
           >
-            <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-[#ffffff] py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-              nothing here
+            <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+              {groups.length == 0 && query !== "" ? (
+                <div className="relative cursor-default select-none py-2 px-4 text-gray-700">
+                  Nothing found.
+                </div>
+              ) : (
+                groups.map((movie) => (
+                  <Combobox.Option
+                    key={movie.title}
+                    className={({ active }) =>
+                      `relative cursor-default select-none py-2 pl-10 pr-4 ${
+                        active ? "bg-blue-600 text-white" : "text-gray-900"
+                      }`
+                    }
+                    value={movie.title}
+                  >
+                    {({ selected, active }) => (
+                      <>
+                        <span
+                          className={`block truncate ${
+                            selected ? "font-medium" : "font-normal"
+                          }`}
+                        >
+                          {movie.title}
+                        </span>
+                      </>
+                    )}
+                  </Combobox.Option>
+                ))
+              )}
             </Combobox.Options>
           </Transition>
         </div>

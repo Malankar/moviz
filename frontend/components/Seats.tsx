@@ -1,21 +1,18 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import User from "../types/User";
+import { useNavigate, useParams } from "react-router-dom";
 interface Seats {
   movie: string;
   seats: string[];
 }
 const Seats = () => {
   const params = useParams();
-  const location = useLocation();
   const navigate = useNavigate();
   const number = Array.from({ length: 28 }, (_, index) => index + 1);
   const letters = Array.from({ length: 15 }, (_, index) =>
     String.fromCharCode(index + 65)
   );
   const [dbSeats, setDbSeats] = useState<Seats | null>(null);
-  const [userSelectedSeats, setUserSelectedSeats] = useState<string[] | null>(null);
   const spaces = [
     "B1",
     "C1",
@@ -119,7 +116,7 @@ const Seats = () => {
     if (user !== null) {
       const email = JSON.parse(user).email;
       try {
-        const res = await axios.patch("http://localhost:8080/seats", {
+        await axios.patch("http://localhost:8080/seats", {
           seats: selectedSeats,
           movie: params.name,
           users: {
@@ -137,14 +134,8 @@ const Seats = () => {
       const res = await axios.get(
         `http://localhost:8080/seats?movie=${params.name}`
       );
-      
+
       setDbSeats(res.data);
-      if (res.data.users.hasOwnProperty("avdhut.satish@gmail.com")) {
-        const value = res.data.users["avdhut.satish@gmail.com"];
-        setUserSelectedSeats(value);
-      } else {
-        setUserSelectedSeats(null);
-      }
     } catch (error) {
       setDbSeats(null);
     }
@@ -175,8 +166,8 @@ const Seats = () => {
                           `bg-white text-white border-none pointer-events-none shadow-none`
                         }
                         ${
-                          (userSelectedSeats!= null && userSelectedSeats.includes(letter + number)) &&
-                          `bg-blue-200 text-white border-none pointer-events-none shadow-none`
+                          dbSeats?.seats.includes(letter + number) &&
+                          `bg-gray-300 text-white border-none pointer-events-none shadow-none`
                         }
                         
                         `}
