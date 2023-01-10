@@ -6,6 +6,7 @@ import com.google.firebase.auth.UserRecord;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
@@ -54,8 +55,6 @@ public class Authentication extends BaseServlet {
       } catch (FirebaseAuthException ex) {
         throw new RuntimeException(ex);
       }
-      System.out.println("Successfully created new user: " + user.getUid());
-
       // Return a success message
       response.setContentType("application/json");
       response.setStatus(HttpServletResponse.SC_OK);
@@ -103,6 +102,8 @@ public class Authentication extends BaseServlet {
       // Authentication was successful, send a response back to the client
       try {
         UserRecord user = FirebaseAuth.getInstance().getUserByEmail(email);
+        Cookie ck=new Cookie("email", user.getEmail());
+        response.addCookie(ck);
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("json");
         response.getWriter().println(new Gson().toJson(user));

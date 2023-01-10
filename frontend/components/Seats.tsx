@@ -8,13 +8,14 @@ interface Seats {
 }
 const Seats = () => {
   const params = useParams();
-  const location=useLocation();
+  const location = useLocation();
   const navigate = useNavigate();
   const number = Array.from({ length: 28 }, (_, index) => index + 1);
   const letters = Array.from({ length: 15 }, (_, index) =>
     String.fromCharCode(index + 65)
   );
   const [dbSeats, setDbSeats] = useState<Seats | null>(null);
+  const [userSelectedSeats, setUserSelectedSeats] = useState<string[] | null>(null);
   const spaces = [
     "B1",
     "C1",
@@ -136,7 +137,14 @@ const Seats = () => {
       const res = await axios.get(
         `http://localhost:8080/seats?movie=${params.name}`
       );
+      
       setDbSeats(res.data);
+      if (res.data.users.hasOwnProperty("avdhut.satish@gmail.com")) {
+        const value = res.data.users["avdhut.satish@gmail.com"];
+        setUserSelectedSeats(value);
+      } else {
+        setUserSelectedSeats(null);
+      }
     } catch (error) {
       setDbSeats(null);
     }
@@ -159,17 +167,18 @@ const Seats = () => {
                   <div className="flex">
                     {number.map((number) => (
                       <div
-                        className={`mr-2 w-8 h-8 flex items-center justify-center  cursor-pointer border-[1px] shadow-lg font-semibold hover:bg-emerald-400 hover:text-white ${
+                        className={`mr-2 w-8 h-8 flex items-center justify-center  cursor-pointer border-[1px] shadow-lg font-semibold hover:bg-blue-600 hover:text-white ${
                           selectedSeats.includes(letter + number) &&
-                          `bg-emerald-400 text-white border-none `
+                          `bg-blue-600 text-white border-none `
                         } ${
                           spaces.includes(letter + number) &&
                           `bg-white text-white border-none pointer-events-none shadow-none`
                         }
                         ${
-                          dbSeats?.seats.includes(letter + number) &&
-                          `bg-gray-300 text-white border-none pointer-events-none shadow-none`
+                          (userSelectedSeats!= null && userSelectedSeats.includes(letter + number)) &&
+                          `bg-blue-200 text-white border-none pointer-events-none shadow-none`
                         }
+                        
                         `}
                         onClick={() => handleSeatClick(letter, number)}
                         key={`${letter}${number}`}
@@ -193,9 +202,9 @@ const Seats = () => {
                   <div className="flex">
                     {number.map((number) => (
                       <div
-                        className={`mr-2 w-8 h-8 flex items-center justify-center  cursor-pointer border-[1px] shadow-lg font-semibold hover:bg-emerald-400 hover:text-white ${
+                        className={`mr-2 w-8 h-8 flex items-center justify-center  cursor-pointer border-[1px] shadow-lg font-semibold hover:bg-blue-600 hover:text-white ${
                           selectedSeats.includes(letter + number) &&
-                          `bg-emerald-400 text-white border-none `
+                          `bg-blue-600 text-white border-none `
                         } ${
                           spaces.includes(letter + number) &&
                           `bg-white text-white border-none pointer-events-none shadow-none`
@@ -227,9 +236,9 @@ const Seats = () => {
                   <div className="flex">
                     {number.map((number) => (
                       <div
-                        className={`mr-2 w-8 h-8 flex items-center justify-center  cursor-pointer border-[1px] shadow-lg font-semibold hover:bg-emerald-400 hover:text-white ${
+                        className={`mr-2 w-8 h-8 flex items-center justify-center  cursor-pointer border-[1px] shadow-lg font-semibold hover:bg-blue-600 hover:text-white ${
                           selectedSeats.includes(letter + number) &&
-                          `bg-emerald-400 text-white border-none `
+                          `bg-blue-600 text-white border-none `
                         } ${
                           spaces.includes(letter + number) &&
                           `bg-white text-white border-none pointer-events-none shadow-none`
