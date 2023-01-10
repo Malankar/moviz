@@ -12,4 +12,4 @@ app/bin
 
 secretkey
 
-backend/app/src/main/java/com/anywhere/firebase/FirebaseConfig.java
+app/src/main/java/com/anywhere/firebase/FirebaseConfig.java
