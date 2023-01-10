@@ -11,3 +11,5 @@ app/bin
 .vscode
 
 secretkey
+
+backend/app/src/main/java/com/anywhere/firebase/FirebaseConfig.java
