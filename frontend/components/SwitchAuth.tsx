@@ -21,7 +21,7 @@ const SwitchAuth: React.FC<Props> = ({ handleClick }) => {
         console.log("Check Your Confirm Password");
       } else {
         const res = await axios.get(
-          `http://localhost:8080/auth?email=${email}&password=${password}`
+          `http://localhost:8080/auth?apiKey=avdhut123&email=${email}&password=${password}`
         );
         localStorage.setItem("user", JSON.stringify(res.data));
         handleClick();

@@ -6,7 +6,7 @@ import com.google.firebase.auth.UserRecord;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import javax.servlet.http.Cookie;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
@@ -64,59 +64,62 @@ public class Authentication extends BaseServlet {
 
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    ServletContext context = getServletContext();
+    String apiKey = context.getInitParameter("apiKey");
+    String requestApiKey = request.getParameter("apiKey");
+    if (requestApiKey.equals(apiKey)) {
+      String email = request.getParameter("email");
+      String password = request.getParameter("password");
 
-    String email = request.getParameter("email");
-    String password = request.getParameter("password");
+      // Validate the email and password
+      if (email == null || password == null || email.isEmpty() || password.isEmpty()) {
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        response.getWriter().println("{\"message\": \"Email and password are required.\"}");
+        return;
+      }
 
-    // Validate the email and password
-    if (email == null || password == null || email.isEmpty() || password.isEmpty()) {
-      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-      response.getWriter().println("{\"message\": \"Email and password are required.\"}");
-      return;
-    }
+      // Build the URL for the Firebase Auth REST API
+      String url = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDTAtPN5DM6lWWs0guwoxRLqpSJJujgtsQ";
 
-    // Build the URL for the Firebase Auth REST API
-    String url = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDTAtPN5DM6lWWs0guwoxRLqpSJJujgtsQ";
+      // Build the request body for the Firebase Auth REST API
+      JsonObject payload = new JsonObject();
+      payload.addProperty("email", email);
+      payload.addProperty("password", password);
+      payload.addProperty("returnSecureToken", true);
 
-    // Build the request body for the Firebase Auth REST API
-    JsonObject payload = new JsonObject();
-    payload.addProperty("email", email);
-    payload.addProperty("password", password);
-    payload.addProperty("returnSecureToken", true);
-
-    // Send the POST request to the Firebase Auth REST API
-    HttpClient client = HttpClient.newHttpClient();
-    HttpRequest apiRequest = HttpRequest.newBuilder()
-        .uri(URI.create(url))
-        .POST(HttpRequest.BodyPublishers.ofString(payload.toString()))
-        .build();
-    HttpResponse<String> apiResponse;
-    try {
-      apiResponse = client.send(apiRequest, HttpResponse.BodyHandlers.ofString());
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e);
-    }
-
-    // Handle the response from the Firebase Auth REST API
-    if (apiResponse.statusCode() == 200) {
-      // Authentication was successful, send a response back to the client
+      // Send the POST request to the Firebase Auth REST API
+      HttpClient client = HttpClient.newHttpClient();
+      HttpRequest apiRequest = HttpRequest.newBuilder()
+          .uri(URI.create(url))
+          .POST(HttpRequest.BodyPublishers.ofString(payload.toString()))
+          .build();
+      HttpResponse<String> apiResponse;
       try {
-        UserRecord user = FirebaseAuth.getInstance().getUserByEmail(email);
-        Cookie ck=new Cookie("email", user.getEmail());
-        response.addCookie(ck);
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setContentType("json");
-        response.getWriter().println(new Gson().toJson(user));
-      } catch (FirebaseAuthException e) {
+        apiResponse = client.send(apiRequest, HttpResponse.BodyHandlers.ofString());
+      } catch (InterruptedException e) {
         throw new RuntimeException(e);
       }
-    } else {
-      // Authentication failed, send a response back to the client
-      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-      response.setContentType("json");
-      response.getWriter().println("{\"message\": \"Invalid email or password.\"}");
-    }
 
+      // Handle the response from the Firebase Auth REST API
+      if (apiResponse.statusCode() == 200) {
+        // Authentication was successful, send a response back to the client
+        try {
+          UserRecord user = FirebaseAuth.getInstance().getUserByEmail(email);
+          response.setStatus(HttpServletResponse.SC_OK);
+          response.setContentType("json");
+          response.getWriter().println(new Gson().toJson(user));
+        } catch (FirebaseAuthException e) {
+          throw new RuntimeException(e);
+        }
+      } else {
+        // Authentication failed, send a response back to the client
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("json");
+        response.getWriter().println("{\"message\": \"Invalid email or password.\"}");
+      }
+    } else {
+      System.out.println("Wrong API key");
+    }
   }
 
 }

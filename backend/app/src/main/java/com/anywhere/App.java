@@ -8,13 +8,14 @@ import com.google.firebase.FirebaseOptions;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
-
 import java.io.FileInputStream;
 
 public class App {
     public static void main(String[] args) throws Exception {
         Server server = new Server(8080);
         WebAppContext webAppContext = new WebAppContext();
+
+        webAppContext.setInitParameter("apiKey", "avdhut123");
         webAppContext.setContextPath("/");
         webAppContext.setResourceBase("src/main/webapp");
 
