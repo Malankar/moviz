@@ -12,13 +12,15 @@ import java.io.FileInputStream;
 
 public class App {
     public static void main(String[] args) throws Exception {
+
         Server server = new Server(8080);
         WebAppContext webAppContext = new WebAppContext();
-
+    
         webAppContext.setInitParameter("apiKey", "avdhut123");
         webAppContext.setContextPath("/");
         webAppContext.setResourceBase("src/main/webapp");
-
+        // webAppContext.setWelcomeFiles(new String[] {"index.jsp"});
+        // webAppContext.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern", ".*/[^/]*jstl.*\\.jar$");
         FileInputStream serviceAccount = new FileInputStream(FirebaseConfig.getServiceAccountKeyPath());
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
@@ -49,6 +51,8 @@ public class App {
         ServletHolder servletHolder7 = new ServletHolder(SearchTitles.class);
         servletHolder7.setInitParameter("urlPattern", "/movies/title");
         webAppContext.addServlet(servletHolder7, "/movies/title");
+
+        // webAppContext.addServlet("src/main/webapp/index.jsp", "/index");
 
         server.setHandler(webAppContext);
         server.start();
