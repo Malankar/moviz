@@ -9,6 +9,7 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
+    id 'war'
 }
 
 repositories {
@@ -20,6 +21,9 @@ dependencies {
     // Use JUnit test framework.
     testImplementation 'junit:junit:4.13'
 
+    implementation 'org.slf4j:slf4j-simple:2.0.6'
+
+
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:29.0-jre'
 
@@ -27,17 +31,17 @@ dependencies {
 
     implementation 'javax.servlet.jsp:javax.servlet.jsp-api:2.3.3'
 
-    implementation 'org.eclipse.jetty:jetty-server:9.4.38.v20210224'
+    implementation 'org.eclipse.jetty:jetty-server:9.2.10.v20150310'
 
-    implementation 'org.eclipse.jetty:jetty-webapp:9.4.38.v20210224'
+    implementation 'org.eclipse.jetty:jetty-webapp:9.2.10.v20150310'
+
+    implementation 'org.eclipse.jetty:jetty-jsp:9.2.10.v20150310'
 
     implementation 'com.google.firebase:firebase-admin:9.1.1'
 
     implementation 'com.google.code.gson:gson:2.8.6'
 
     implementation group: 'commons-io', name: 'commons-io', version: '2.8.0'
-
-    implementation 'org.eclipse.jetty:apache-jsp:9.2.15.v20160210'
 
     implementation 'javax.servlet:jstl:1.2'
 
@@ -51,4 +55,10 @@ application {
 task startServer(type: JavaExec) {
     main = 'com.anywhere.App'
     classpath = sourceSets.main.runtimeClasspath
+}
+
+task buildWar(type: War) {
+    baseName = 'myWar'
+    version =  '1.0'
+    webAppDirName = 'src/main/webapp'
 }
