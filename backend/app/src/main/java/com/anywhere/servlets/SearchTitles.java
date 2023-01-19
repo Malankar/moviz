@@ -1,6 +1,6 @@
 package com.anywhere.servlets;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import com.anywhere.Models.Movie;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
@@ -8,7 +8,7 @@ import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.gson.Gson;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

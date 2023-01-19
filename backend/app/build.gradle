@@ -9,6 +9,7 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
+    id "org.gretty" version "4.0.3"
     id 'war'
 }
 
@@ -16,6 +17,8 @@ repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
 }
+
+mainClassName  = 'com.anywhere.App'
 
 dependencies {
     // Use JUnit test framework.
@@ -27,15 +30,7 @@ dependencies {
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:29.0-jre'
 
-    implementation 'javax.servlet:javax.servlet-api:4.0.1'
-
-    implementation 'javax.servlet.jsp:javax.servlet.jsp-api:2.3.3'
-
-    implementation 'org.eclipse.jetty:jetty-server:9.2.10.v20150310'
-
-    implementation 'org.eclipse.jetty:jetty-webapp:9.2.10.v20150310'
-
-    implementation 'org.eclipse.jetty:jetty-jsp:9.2.10.v20150310'
+    compileOnly 'jakarta.servlet:jakarta.servlet-api:6.0.0'
 
     implementation 'com.google.firebase:firebase-admin:9.1.1'
 
@@ -47,18 +42,7 @@ dependencies {
 
 }
 
-application {
-    // Define the main class for the application.
-    mainClass = 'com.anywhere.App'
-}
-
-task startServer(type: JavaExec) {
-    main = 'com.anywhere.App'
-    classpath = sourceSets.main.runtimeClasspath
-}
-
-task buildWar(type: War) {
-    baseName = 'myWar'
-    version =  '1.0'
-    webAppDirName = 'src/main/webapp'
+gretty {
+    httpPort = 8080
+    contextPath = '/'
 }

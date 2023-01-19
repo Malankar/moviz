@@ -6,21 +6,22 @@ import com.google.cloud.firestore.*;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.gson.Gson;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-public class Movies extends PatchServlet {
+public class Movies extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         FirebaseApp app = FirebaseApp.getInstance();
@@ -68,7 +69,6 @@ public class Movies extends PatchServlet {
             throws IOException, ServletException {
         FirebaseApp app = FirebaseApp.getInstance();
         Firestore db = FirestoreClient.getFirestore(app);
-
         String requestType = request.getParameter("type");
         if (requestType == null) {
             // Initialize the Firebase Admin SDK and create a Firestore client
